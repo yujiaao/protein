@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longest Common Subsequence</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="cosine-similarity.js"></script>
+    <script>
+
+
+        let s = `MGGEGRVEVVGGKGCSRLFSSSFSSLRGLPPLEPMSPVSSSVQVRSSAPFAGLVICVTGL
+SKEARNQVMEATERLGGQYSPNLHPQCTHLYSFGGRKFEHALKHGAKIGLFVVTLGWFVD
+SVRKNVRLTESHYSVKSYGDSNMRLDDFKLLPGYTNADNCLPARIHETKHAHCAEEFQRF
+SGRESNRSLDSTLSGCSIYIDPCISSELRNKVCETASREGASLVEQWLVGCNVSHVVTEG
+TSIQRYLGYSSNLITPLWILKTAKEKHVQRLIHMSVDLARQVGLMLEDTHNGISGKRLQS
+ILINTKE`
+    </script>
+    </script>
+</head>
+
+<body>
+    <div id="app7">
+        <h1>Longest Common Subsequence</h1>
+
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="序列一">
+                <el-input type="textarea" v-model="form.seq1"></el-input>
+            </el-form-item>
+            <el-form-item label="序列二">
+                <el-input type="textarea" v-model="form.seq2"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <div class="el-info">{{form.result}}</div>
+            </el-form-item>
+            <h2>{{similarity}}</h2>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">计算</el-button>
+            </el-form-item>
+
+            <el-table :data="tableData" style="width: 100%">
+
+
+                <el-table-column v-for="(item, index) in codes" :key="index" :prop="item" :label="item" width="60">
+                </el-table-column>
+
+
+            </el-table>
+        </el-form>
+
+    </div>
+
+    <script>
+        var app6 = new Vue({
+            el: '#app7',
+            data() {
+                return {
+                    form: {
+                        seq1: '',
+                        seq2: '',
+                        result: ''
+                    },
+                    codes: ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+                    , tableData: [
+                        {  }
+                    ],
+                    similarity:0
+
+
+                }
+            },
+            watch: {
+                form() {
+                    this.onSubmit()
+                }
+
+            },
+
+            methods: {
+                count(string) {
+                    var strObj = {};
+                    var strLen = string.length;
+                    for (var i = 0; i < strLen; i++) {
+                        var key = string[i];
+                        if (strObj[key]) {
+                            strObj[key]++;
+                        }
+                        else {
+                            strObj[key] = 1;
+                        }
+                    }
+                    return strObj;
+                },
+                onSubmit() {
+                    let cnt1 = this.count(this.form.seq1)
+                    let cnt2 = this.count(this.form.seq2)
+                    this.tableData = [
+                        cnt1,
+                       cnt2
+                    ]
+                    let vec1 = this.codes.map((item)=>{
+                       return cnt1[item] || 0
+                    });
+                    let vec2 = this.codes.map((item)=>{
+                       return cnt2[item] || 0
+                    })
+                    
+                    this.similarity = new window.CosineSimilarity().similarity(vec1,vec2)
+
+
+                }
+
+            }
+        })
+    </script>
+
+
+
+
+
+</body>
+
+</html>

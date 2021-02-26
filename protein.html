@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+ 
+</head>
+ 
+<body>
+    <script>
+      
+ 
+        let s = `MGGEGRVEVVGGKGCSRLFSSSFSSLRGLPPLEPMSPVSSSVQVRSSAPFAGLVICVTGL
+SKEARNQVMEATERLGGQYSPNLHPQCTHLYSFGGRKFEHALKHGAKIGLFVVTLGWFVD
+SVRKNVRLTESHYSVKSYGDSNMRLDDFKLLPGYTNADNCLPARIHETKHAHCAEEFQRF
+SGRESNRSLDSTLSGCSIYIDPCISSELRNKVCETASREGASLVEQWLVGCNVSHVVTEG
+TSIQRYLGYSSNLITPLWILKTAKEKHVQRLIHMSVDLARQVGLMLEDTHNGISGKRLQS
+ILINTKE`
+    </script>
+ 
+ 
+    <div id="app-6">
+        <h1> protein sequence</h1>
+ 
+        <textarea v-model="message" size='80' width="400px" rows="10"> </textarea>
+        <div>
+            cut length <input type="text" v-model='cutLength' placeholder="Cut Length">
+            <div>
+                <div>
+                    start <input type="text" v-model='start' placeholder="start">
+ 
+                </div>
+                <div>
+ 
+                    end <input type="text" v-model='end' placeholder="end">
+                </div>
+                <div>
+                    <button v-on:click="msgChange">calc</button>
+                </div>
+                <div>
+                    <div>brct:</div>
+                    <div>{{brct}}</div>
+                    <div>before:</div>
+                    <div>{{before}}</div>
+                    <div>after:</div>
+                    <div>{{after}}</div>
+                </div>
+ 
+ 
+            </div>
+        </div>
+    </div>
+    <script>
+        var app6 = new Vue({
+            el: '#app-6',
+            data: {
+                message: s,
+                brct: '',
+                before: '',
+                after: '',
+                start: 10,
+                end: 20,
+                cutLength: 20
+            },
+            watch: {
+                end: function(startNew, startOld) {
+                    this.msgChange()
+                },
+                message: function(startNew, startOld) {
+                    this.msgChange()
+                },
+                end: function(startNew, startOld) {
+                    this.msgChange()
+                }
+ 
+            },
+            methods: {
+                msgChange() {
+                    s = this.message;
+                    s = s.replaceAll('\n', '')
+                    s = s.replaceAll('\r', '')
+ 
+                    this.brct = s.substr(this.start, this.end - this.start)
+                    this.before = s.substr(this.start - this.cutLength, this.cutLength)
+                    this.after = s.substr(this.end, this.cutLength)
+                    console.log(this.brct);
+                }
+ 
+            }
+        })
+    </script>
+ 
+ 
+ 
+</body>
+ 
+</html>

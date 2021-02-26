@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longest Common Subsequence</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+
+
+        /**
+        1.	Design an algorithm to find the Longest Common Subsequence,
+        Longest Common Substring between two sequences.
+        * Created by zoutai on 2017/10/1.
+        * 从后向前遍历查找，迭代/遍历+动态规划
+        * 但是递归的方式有一个坏处，就是内部往往那个存在很多重复计算，最大时间复杂度2^n
+        * 所以我们采用空间换时间的办法:直接将所有的L[i][j]遍历出来，时间复杂度即为（mn）
+        */
+
+        function run(s1, s2) {
+            // let s1 = "AGGTAB";
+            // let s2 = "GXTXAYB";
+            let m = s1.length, n = s2.length;
+            let result = getLongestSubStr(s1, s2, m, n);
+            console.log(result);
+            return result;
+        }
+
+        // 从后向前遍历
+        function getLongestSubStr(s1, s2, m, n) {
+            if (m == 0 || n == 0)
+                return "";
+            if (s1.charAt(m - 1) == s2.charAt(n - 1))
+                return getLongestSubStr(s1, s2, m - 1, n - 1) + s1.charAt(m - 1);
+            else
+                return max(getLongestSubStr(s1, s2, m, n - 1), getLongestSubStr(s1, s2, m - 1, n));
+        }
+
+        // 比较字符串长度
+        function max(a, b) {
+            if (a == null || b == null) {
+                return "";
+            }
+            return a.length > b.length ? a : b;
+        }
+
+
+    </script>
+    </script>
+</head>
+
+<body>
+    <div id="app7">
+        <h1>Longest Common Subsequence</h1>
+
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="序列一">
+                <el-input type="textarea" v-model="form.seq1"></el-input>
+            </el-form-item>
+            <el-form-item label="序列二">
+                <el-input type="textarea" v-model="form.seq2"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <div class="el-info">{{form.result}}</div>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">计算</el-button>
+            </el-form-item>
+        </el-form>
+
+    </div>
+
+    <script>
+        var app6 = new Vue({
+            el: '#app7',
+            data() {
+                return {
+                    form: {
+                        seq1: '',
+                        seq2: '',
+                        result: ''
+                    },
+                }
+            },
+            watch:{
+                form(){
+                    this.onSubmit()
+                }
+
+            },
+
+            methods: {
+                onSubmit() {
+                    this.form.result = run(this.form.seq1, this.form.seq2)
+                }
+
+            }
+        })
+    </script>
+
+
+
+
+
+</body>
+
+</html>

@@ -70,27 +70,11 @@
 
             },
             methods: {
+                
                 msgChange() {
-                    this.tableData = []
 
-                    alignment.map((item, index) => {
-                        let key = item[0]
-                        let start = item[1]
-                        let end = item[2]
-                        let name = item[3]
-
-
-                        let value = brct[key]
-                        let v = value.replaceAll('\n', '').replaceAll('\r', '')
-
-                        let brctCut = v.substr(start, end - start)
-                        let before = v.substr(start - this.cutLength, this.cutLength)
-                        let after = v.substr(end, this.cutLength)
-                        this.tableData.push({ key, start, end, before, 'brct': brctCut, after,name })
-
-
-                    })
-
+                    this.tableData = this.calcTableData(alignment, brct, this.cutLength)
+                    
                 }
 
             }

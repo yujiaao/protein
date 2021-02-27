@@ -11,69 +11,45 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <!-- 引入组件库 -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <script src="brct.js"></script>
+    <script src="alignment1.js"></script>
+    <script src="lcss1.js"></script>
     <script>
-
-
-        /**
-        1.	Design an algorithm to find the Longest Common Subsequence,
-        Longest Common Substring between two sequences.
-        * Created by zoutai on 2017/10/1.
-        * 从后向前遍历查找，迭代/遍历+动态规划
-        * 但是递归的方式有一个坏处，就是内部往往那个存在很多重复计算，最大时间复杂度2^n
-        * 所以我们采用空间换时间的办法:直接将所有的L[i][j]遍历出来，时间复杂度即为（mn）
-        */
-
-        function run(s1, s2) {
-            // let s1 = "AGGTAB";
-            // let s2 = "GXTXAYB";
-            let m = s1.length, n = s2.length;
-            let result = getLongestSubStr(s1, s2, m, n);
-            console.log(result);
-            return result;
-        }
-
-        // 从后向前遍历
-        function getLongestSubStr(s1, s2, m, n) {
-            if (m == 0 || n == 0)
-                return "";
-            if (s1.charAt(m - 1) == s2.charAt(n - 1))
-                return getLongestSubStr(s1, s2, m - 1, n - 1) + s1.charAt(m - 1);
-            else
-                return max(getLongestSubStr(s1, s2, m, n - 1), getLongestSubStr(s1, s2, m - 1, n));
-        }
-
-        // 比较字符串长度
-        function max(a, b) {
-            if (a == null || b == null) {
-                return "";
-            }
-            return a.length > b.length ? a : b;
-        }
-
-
+      //共同序列，可不连续
+      let a =  longestCommonSubsequence("DEFABCDE","ABCDEF")
+      console.log("a=",a);
+     
+      //共同最大连续序列
+      let b= getLongestCommonSequencesBetweenTwoSequences("DEFABCDE","ABCDEF")
+      console.log("b=",b);
     </script>
-    </script>
+
 </head>
 
 <body>
     <div id="app7">
         <h1>Longest Common Subsequence</h1>
+        <div class="block">
+            <span class="demonstration">Cut length</span>
+            <el-slider v-model="cutLength"></el-slider>
+          </div>
 
-        <el-form ref="form" :model="form" label-width="80px">
-            <el-form-item label="序列一">
-                <el-input type="textarea" v-model="form.seq1"></el-input>
-            </el-form-item>
-            <el-form-item label="序列二">
-                <el-input type="textarea" v-model="form.seq2"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <div class="el-info">{{form.result}}</div>
-            </el-form-item>
+        <el-button type="primary" @click="onSubmit">计算</el-button>
+        <el-progress :text-inside="true" :stroke-width="24" :percentage="percentage" status="success"></el-progress>
 
-            <el-form-item>
-                <el-button type="primary" @click="onSubmit">计算</el-button>
-            </el-form-item>
-        </el-form>
+
+        <el-table :data="tableData" style="width: 100%" 
+        height="500px"
+        
+        border :default-sort="{prop: 'name', order: 'descending'}">
+            <el-table-column  
+             prop="key" label="key" fixed>
+            </el-table-column>
+            <el-table-column v-for="(item, index) in alignment" 
+            :key="index" :prop="item[0].replaceAll('>', '').replaceAll('.', '_')" :label="item[0].substr(11)">
+            </el-table-column>
+        </el-table>
 
     </div>
 
@@ -82,22 +58,41 @@
             el: '#app7',
             data() {
                 return {
-                    form: {
-                        seq1: '',
-                        seq2: '',
-                        result: ''
-                    },
+                    cutLength: 10,
+                    percentage:0,
+                    alignment: alignment,
+                    tableData: []
                 }
             },
-            watch:{
-                form(){
-                    this.onSubmit()
-                }
-            },
-
+           
             methods: {
                 onSubmit() {
-                    this.form.result = run(this.form.seq1, this.form.seq2)
+                    let table1 = calcTableData(alignment, brct, this.cutLength)
+                    this.percentage = 10
+                    this.tableData = []
+                    table1.map((itemI,i)=>{
+                         let row = {key:itemI.key.substr(11)}
+                         let keyI = itemI.key.replaceAll('>', '').replaceAll('.', '_') 
+
+                         table1.map((itemJ, j)=>{
+                            this.percentage = (i*table1.length+j+1.0)/table1.length/table1.length*100;
+                            let keyJ = itemJ.key.replaceAll('>', '').replaceAll('.', '_')
+                            if(keyJ==keyI) {
+                                row[keyJ] = '-'
+                                return 
+                            }
+                            row[keyJ] = i==j? "-": getLongestCommonSequencesBetweenTwoSequences(itemI.brct, itemJ.brct)
+
+                            if(row[keyJ].length==1){
+                                row[keyJ]='-'
+                            }
+                            // console.log(this.percentage, itemI.key, row[key]);
+                            
+                        })
+
+                        this.tableData.push(row)
+                    })
+                    console.log(this.tableData);
                 }
 
             }

@@ -34,4 +34,63 @@ const alignment = [
 ['>evm.model.8.806', 9, 71, 'BRCT'],
 ]
 
-//export default alignment
+//output 'key', 'start', 'end', 'before', 'brct', 'after','name'
+//  where name is hmm-name, key is protein sequence id
+// brct is BRCT domain
+function calcTableData(alignment, brct, cutLength){
+    let data =[];
+
+    alignment.map((item, index) => {
+        let key = item[0]
+        let start = item[1]
+        let end = item[2]
+        let name = item[3]
+
+
+        let value = brct[key]
+        let v = value.replaceAll('\n', '').replaceAll('\r', '')
+
+        let brctCut = v.substr(start, end - start)
+        let before = v.substr(start - cutLength, cutLength)
+        let after = v.substr(end, cutLength)
+        data.push({ key, start, end, before, 'brct': brctCut, after,name })
+    })
+    return data;
+}
+
+
+/**
+ *  链接：https://leetcode-cn.com/problems/longest-common-subsequence/solution/js-dian-xing-de-dong-tai-gui-hua-by-hblvsjtu/
+ * @param {string} text1
+ * @param {string} text2
+ * @return {string}  // {number}
+ */
+var longestCommonSubsequence = function(text1, text2) {
+    const dp = [];
+    for(let i = 0; i <= text1.length; i++) {
+        dp[i] = [];
+        for(let j = 0; j <= text2.length; j++) {
+            if (!i || !j) dp[i][j] = 0;
+            else if (text1[i - 1] === text2[j - 1]){
+             dp[i][j] = dp[i - 1][j - 1] + 1;    
+            }
+            else{
+             dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    let temp='';
+    let last = dp[text1.length]; 
+    //if(last[0]>0) temp += text2.charAt(0)
+    for(let j=0; j<text2.length; j++){
+        if(last[j]<last[j+1]){
+            temp += text2.charAt(j)
+        }
+    }
+    // console.log(dp);
+    // debugger
+    //return dp[text1.length][text2.length];
+    return temp;
+};
+
+

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>batch cut</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!--
+        该家族是类BRCT （CL0459）的成员，其描述如下：
+
+        BRCT结构域主要存在于与DNA损伤相关的细胞周期检查点功能所涉及的蛋白质中。
+
+        氏族包含以下9个成员： BRCT BRCT_2 BRCT_3 Dfp1_Him1_M LIG3_BRCT NIBRIN_BRCT_II PTCB-BRCT RTT107_BRCT_5 RTT107_BRCT_6
+    -->
+</head>
+
+<body>
+    <script src="brct.js"></script>
+    <script src="alignment1.js"></script>
+
+
+    <div id="app-6">
+        <h1> protein sequence</h1>
+
+        <div>
+            <div class="block">
+                <span class="demonstration">Cut length</span>
+                <el-slider v-model="cutLength"></el-slider>
+              </div>
+            <div>
+                <div>
+                    <el-button v-on:click="msgChange"  type="primary">calc</el-button>
+                </div>
+            </div>
+
+            <el-table :data="tableData" style="width: 100%" border   
+              :default-sort = "{prop: 'name', order: 'descending'}"
+            >
+                <el-table-column v-for="(item, index) in codes" 
+                :key="index" 
+                :prop="item" 
+                :label="item"
+                sortable
+                    :width="colWidth[item]">
+                </el-table-column>
+            </el-table>
+        </div>
+    </div>
+    <script>
+        var app6 = new Vue({
+            el: '#app-6',
+
+            data: {
+                message: brct,
+                codes: [
+                    'key', 'start', 'end', 'before', 'brct', 'after','name'
+                ],
+                colWidth: { key: 150, start: 70, end: 70, before: 250, brct: 500, after: 250 ,name:100},
+                cutLength: 20,
+                tableData: [
+                ],
+            },
+            watch: {
+
+            },
+            methods: {
+                msgChange() {
+                    this.tableData = []
+
+                    alignment.map((item, index) => {
+                        let key = item[0]
+                        let start = item[1]
+                        let end = item[2]
+                        let name = item[3]
+
+
+                        let value = brct[key]
+                        let v = value.replaceAll('\n', '').replaceAll('\r', '')
+
+                        let brctCut = v.substr(start, end - start)
+                        let before = v.substr(start - this.cutLength, this.cutLength)
+                        let after = v.substr(end, this.cutLength)
+                        this.tableData.push({ key, start, end, before, 'brct': brctCut, after,name })
+
+
+                    })
+
+                }
+
+            }
+        })
+    </script>
+
+
+
+</body>
+
+</html>

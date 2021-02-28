@@ -40,7 +40,7 @@
             </div>
 
             <el-table :data="tableData" style="width: 100%" border   
-              :default-sort = "{prop: 'name', order: 'descending'}"
+              :default-sort = "{prop: 'No', order: 'ascending'}"
             >
             <el-table-column label='No' prop="No">
 
@@ -60,14 +60,12 @@
             el: '#app-6',
 
             data: {
-                message: brct,
                 codes: [
                     'key', 'start', 'end', 'before', 'brct', 'after','name'
                 ],
                 colWidth: { key: 150, start: 70, end: 70, before: 250, brct: 500, after: 250 ,name:100},
                 cutLength: 20,
-                tableData: [
-                ],
+                tableData: [],
             },
             watch: {
 

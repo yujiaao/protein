@@ -201,7 +201,6 @@
                     this.proteins.map((v) => {
                         cnts.push({ key: v.key, ...this.count(v.value) })
                     }) 
-                    debugger
 
                     this.tableDataProtein = cnts
                     this.similarityProtein = this.countsSimilarity(cnts)

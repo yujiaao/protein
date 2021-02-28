@@ -30,7 +30,7 @@ const alignment = [
     // ['>evm.model.6.575', 197, 224, 'BRCA2'],
     ['>evm.model.8.2802', 968, 1064, 'BRCT_3'],
     ['>evm.model.8.777', 9, 71, 'BRCT'],
-    ['>evm.model.8.806', 9, 71, 'BRCT'],
+    // ['>evm.model.8.806', 9, 71, 'BRCT'],
 ]
 
 //output 'key', 'start', 'end', 'before', 'brct', 'after','name'

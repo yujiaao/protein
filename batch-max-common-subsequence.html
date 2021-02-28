@@ -14,25 +14,11 @@
 
     <script src="proteins.js"></script>
     <script src="alignment1.js"></script>
-    <!-- <script src="lcss1.js"></script> -->
-    <script>
-        //共同序列，可不连续
-        // let a = longest_substring("DEFABCDE", "ABCDEF")
-        // console.log("a=", a);
-        // console.log('alhms=', longestCommonSubsequence('alchemist', 'algorithms'));
-        // console.log('alhms=', longestCommonSubsequence('algorithms', 'alchemist'));
-
-        // //共同最大连续序列
-        // let evm_model_1_10740 = 'DSLEREEAEDLIKRHGGRVTGSVSKKTNYLLCDEDIEGRKSSKAKELGT'
-        // let evm_model_1_10808 = 'RTHHYWKTSIEKHGGKVANSIIGATCLVASPAERERGGTSKLAEAMERGIPVVREAWLTDSIEKQEPQPLEAY'
-        // let b = longest_substring(evm_model_1_10740, evm_model_1_10808)
-        // let d = longest_substring(evm_model_1_10808, evm_model_1_10740)
-        // console.log('b=', b, 'd=', d);
-
-        // let b1 = longestCommonSubsequence(evm_model_1_10740, evm_model_1_10808)
-        // let d1 = longestCommonSubsequence(evm_model_1_10808, evm_model_1_10740)
-        // console.log('b1=', b1, 'd1=', d1);
-    </script>
+    <style>
+        .el-table th{
+            user-select: text; /* 可以选中，以便拷贝表头*/
+        }
+    </style>
 
 </head>
 
@@ -53,9 +39,9 @@
 
         <h2>BRCT 最大子序 max common subsequence</h2>
 
-        <el-table :data="tableData" style="width: 100%" height="500px" border
+        <el-table :data="tableData" style="width: 100%"  border
             :default-sort="{prop: 'name', order: 'descending'}">
-            <el-table-column prop="key" label="key" fixed>
+            <el-table-column prop="key" label="key" >
             </el-table-column>
             <el-table-column v-for="(item, index) in alignment" :key="index"
                 :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">
@@ -64,9 +50,9 @@
 
         <h2>前缀比较 Prefix</h2>
 
-        <el-table :data="tableDataPrefix" style="width: 100%" height="500px" border
+        <el-table :data="tableDataPrefix" style="width: 100%"  border
             :default-sort="{prop: 'name', order: 'descending'}">
-            <el-table-column prop="key" label="key" fixed>
+            <el-table-column prop="key" label="key" >
             </el-table-column>
             <el-table-column v-for="(item, index) in alignment" :key="index"
                 :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">
@@ -76,9 +62,9 @@
 
         <h2>后缀比较 Suffix</h2>
 
-        <el-table :data="tableDataSuffix" style="width: 100%" height="500px" border
+        <el-table :data="tableDataSuffix" style="width: 100%"  border
             :default-sort="{prop: 'name', order: 'descending'}">
-            <el-table-column prop="key" label="key" fixed>
+            <el-table-column prop="key" label="key" >
             </el-table-column>
             <el-table-column v-for="(item, index) in alignment" :key="index"
                 :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">

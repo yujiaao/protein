@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calc Cosine Similarity</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <script type="text/javascript" src="//unpkg.com/xlsx/dist/shim.min.js"></script>
+    <script type="text/javascript" src="//unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+    <script type="text/javascript" src="//unpkg.com/blob.js@1.0.1/Blob.js"></script>
+    <script type="text/javascript" src="//unpkg.com/file-saver@1.3.3/FileSaver.js"></script>
+
+
+    <script src="cosine-similarity.js"></script>
+    <script src="brct.js"></script>
+    <script src="alignment1.js"></script>
+    <style>
+        .my {
+            background: #c6ffdd;
+            /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
+            /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
+            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background-color: rgb(212, 90, 67);
+            /*
+       239	147	102	
+       80	119	175	
+*/
+        }
+    </style>
+    <script>
+        
+    </script>
+
+
+</head>
+
+<body>
+    <div id="app7">
+        <h1>BRCT 域氨基酸数量统计余弦相似度计算 Calc BRCT Domain Cosine Similarity</h1>
+
+        <el-form ref="form" label-width="180px">
+            <el-form-item :label="item.key" v-for='(item, index) in brcts' :key="index">
+                <span>{{item.brct}}</span>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">计算</el-button>
+            </el-form-item>
+            <h2>amino acid counts</h2>
+            <el-table :data="tableData" style="width: 100%">
+                <el-table-column label="name" prop="key"></el-table-column>
+                <el-table-column v-for="(item, index) in codes" :key="index" :prop="item" :label="item" width="60">
+                </el-table-column>
+
+            </el-table>
+
+            <h2>Similarity</h2>
+
+            <el-table :data="similarity" style="width: 100%" :cell-style="cellStyle">
+
+                <el-table-column label="name" prop="key"></el-table-column>
+                <el-table-column v-for="(item, index) in brcts" :key="index" :prop="normKey(item.key)"
+                    :label="item.key.substr(11)">
+                    <template slot-scope="scope">
+                        {{ humanize(scope.row[normKey(item.key)])}}</span>
+                    </template>
+                </el-table-column>
+
+            </el-table>
+
+        </el-form>
+
+    </div>
+
+    <script>
+        var app6 = new Vue({
+            el: '#app7',
+            data() {
+                return {
+                    cutLength: 10,
+                    brcts: calcTableData(alignment, brct, this.cutLength),
+
+                    codes: ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+                    , tableData: [
+                        {}
+                    ],
+                    similarity: [],
+                    simMax: 0,
+                    simMin: 1,
+
+                }
+            },
+
+            methods: {
+                normKey(key) {
+                    return key.replaceAll('>', '').replaceAll('.', '_')
+                },
+                humanize(x) {//保留3位小数，不要尾零
+                    return x.toFixed(3).replace(/\.?0*$/, '');
+                },
+                // 为关键字的三种状态：匹配成功、未找到关键字、参考值不一致设置颜色
+                cellStyle({ row, column, rowIndex, columnIndex }) {
+                    //console.log("row", row);
+                    // debugger
+                    let colors = ['#002254', '#284d4b', '#2c7c3b', '#00ad17', '#30cd57']
+                    let index = 0
+                    if (rowIndex >= 0 && columnIndex > 0) { // filetypeName...这些都是表格字段
+                        let data = row[column.property];
+                        // if (data < 0.7) {
+                        //     index = 0; // class名称
+                        // } else if (data < 0.8) {
+                        //     index = 1; // class名称
+                        // } else if (data < 0.9) {
+                        //     index = 2;　　// class名称
+                        // } else if (data < 0.95) {
+                        //     index = 3;　　// class名称
+                        // } else {
+                        //     index = 4;　　// class名称
+                        // }
+                        let rgb = mapColor(data, this.simMin, this.simMax) 
+                        // return 'background-color: ' + colors[index] + ';'
+                        return 'background-color: rgb(' + rgb[0]+','+rgb[1]+','+ rgb[2] + ');'
+                    }
+                },
+                count(string) {
+                    var strObj = {};
+                    var strLen = string.length;
+                    for (var i = 0; i < strLen; i++) {
+                        var key = string[i];
+                        if (strObj[key]) {
+                            strObj[key]++;
+                        }
+                        else {
+                            strObj[key] = 1;
+                        }
+                    }
+                    return strObj;
+                },
+                onSubmit() {
+                    let funSim = new window.CosineSimilarity()
+                    let cnts = []
+                    this.brcts.map((v) => {
+                        cnts.push({ key: v.key, ...this.count(v.brct) })
+                    })
+                    this.tableData = cnts
+
+                    let vecs = []
+                    cnts.map(cnt =>
+                        vecs.push(this.codes.map(item =>
+                            cnt[item] = cnt[item] || 0
+                        ))
+                    )
+
+                    console.log("cnts", cnts);
+                    console.log("vecs", vecs);
+
+                    this.similarity = []
+                    vecs.map((vec1, i) => {
+                        let row = {}
+                        vecs.map((vec2, j) => {
+                            let key = this.normKey(cnts[j].key)
+                            row[key] = funSim.similarity(vec1, vec2)
+                            if(this.simMax< row[key]) this.simMax = row[key]
+                            if(this.simMin> row[key]) this.simMin = row[key]
+                        })
+                        this.similarity.push({ key: cnts[i].key.substr(11), ...row })
+                    })
+                    console.log("similarity", this.similarity);
+
+                }
+
+            }
+        })
+    </script>
+
+
+
+
+
+</body>
+
+</html>

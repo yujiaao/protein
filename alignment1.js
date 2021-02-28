@@ -130,7 +130,7 @@ const scale = (num, in_min, in_max, out_min, out_max) => {
 }
 
 function mapColor(v, minV, maxV) {
-    let cmin = [198, 255, 221]
+    let cmin = [0x01,0x74,0x2f] //[198, 255, 221]
     let cmid = [251, 215, 134]
     let cmax = [247, 121, 125]
     let midV = (minV + maxV) / 2;

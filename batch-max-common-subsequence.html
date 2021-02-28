@@ -12,7 +12,7 @@
     <!-- 引入组件库 -->
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 
-    <script src="brct.js"></script>
+    <script src="proteins.js"></script>
     <script src="alignment1.js"></script>
     <!-- <script src="lcss1.js"></script> -->
     <script>
@@ -140,7 +140,7 @@
                 },
                 onSubmit() {
                     this.progeressVisible = true
-                    let table1 = calcTableData(alignment, brct, this.cutLength)
+                    let table1 = calcTableData(alignment, proteins, this.cutLength)
                     this.percentage = 10
                     this.tableData = this.compareField(table1, 'brct')
                     this.tableDataPrefix = this.compareField(table1, 'before')

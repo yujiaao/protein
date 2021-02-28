@@ -20,11 +20,11 @@
 
 
     <script src="cosine-similarity.js"></script>
-    <script src="brct.js"></script>
+    <script src="proteins.js"></script>
     <script src="alignment1.js"></script>
     <style>
         .my {
-            background: #c6ffdd;
+            background: #01742f;
             /* fallback for old browsers */
             background: -webkit-linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
             /* Chrome 10-25, Safari 5.1-6 */
@@ -38,7 +38,7 @@
         }
     </style>
     <script>
-        
+
     </script>
 
 
@@ -56,7 +56,7 @@
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">计算</el-button>
             </el-form-item>
-            <h2>amino acid counts</h2>
+            <h2>BRCT amino acid counts</h2>
             <el-table :data="tableData" style="width: 100%">
                 <el-table-column label="name" prop="key"></el-table-column>
                 <el-table-column v-for="(item, index) in codes" :key="index" :prop="item" :label="item" width="60">
@@ -64,13 +64,34 @@
 
             </el-table>
 
-            <h2>Similarity</h2>
+            <h2>BRCT Similarity</h2>
 
             <el-table :data="similarity" style="width: 100%" :cell-style="cellStyle">
 
                 <el-table-column label="name" prop="key"></el-table-column>
                 <el-table-column v-for="(item, index) in brcts" :key="index" :prop="normKey(item.key)"
                     :label="item.key.substr(11)">
+                    <template slot-scope="scope">
+                        {{ humanize(scope.row[normKey(item.key)])}}</span>
+                    </template>
+                </el-table-column>
+
+            </el-table>
+
+            <h2>While protein: amino acid counts</h2>
+            <el-table :data="tableDataProtein" style="width: 100%">
+                <el-table-column label="name" prop="key"></el-table-column>
+                <el-table-column v-for="(item, index) in codes" :key="index" :prop="item" :label="item" width="60">
+                </el-table-column>
+
+            </el-table>
+
+            <h2>While protein: similarity</h2>
+
+            <el-table :data="similarityProtein" style="width: 100%" :cell-style="cellStyle">
+
+                <el-table-column label="name" prop="key"></el-table-column>
+                <el-table-column v-for="(item, index) in proteins" :key="index" :prop="normKey(item.key)" :label="item.key">
                     <template slot-scope="scope">
                         {{ humanize(scope.row[normKey(item.key)])}}</span>
                     </template>
@@ -88,15 +109,26 @@
             data() {
                 return {
                     cutLength: 10,
-                    brcts: calcTableData(alignment, brct, this.cutLength),
+                    brcts: calcTableData(alignment, proteins, this.cutLength),
 
                     codes: ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
-                    , tableData: [
-                        {}
-                    ],
+                    , tableData: [],
                     similarity: [],
                     simMax: 0,
                     simMin: 1,
+                    tableDataProtein: [],
+                    proteins: (()=>{
+                        let proteinsDict = []
+                        for (var key in proteins) {
+                            // check if the property/key is defined in the object itself, not in parent
+                            if (proteins.hasOwnProperty(key)) {
+                                proteinsDict.push({ key, value: proteins[key] })
+                            }
+                        }
+                        return proteinsDict
+                    })(),
+                    similarityProtein: [],
+
 
                 }
             },
@@ -110,26 +142,11 @@
                 },
                 // 为关键字的三种状态：匹配成功、未找到关键字、参考值不一致设置颜色
                 cellStyle({ row, column, rowIndex, columnIndex }) {
-                    //console.log("row", row);
-                    // debugger
-                    let colors = ['#002254', '#284d4b', '#2c7c3b', '#00ad17', '#30cd57']
-                    let index = 0
-                    if (rowIndex >= 0 && columnIndex > 0) { // filetypeName...这些都是表格字段
+                    if (rowIndex >= 0 && columnIndex > 0) {
                         let data = row[column.property];
-                        // if (data < 0.7) {
-                        //     index = 0; // class名称
-                        // } else if (data < 0.8) {
-                        //     index = 1; // class名称
-                        // } else if (data < 0.9) {
-                        //     index = 2;　　// class名称
-                        // } else if (data < 0.95) {
-                        //     index = 3;　　// class名称
-                        // } else {
-                        //     index = 4;　　// class名称
-                        // }
-                        let rgb = mapColor(data, this.simMin, this.simMax) 
-                        // return 'background-color: ' + colors[index] + ';'
-                        return 'background-color: rgb(' + rgb[0]+','+rgb[1]+','+ rgb[2] + ');'
+
+                        let rgb = mapColor(data, this.simMin, this.simMax)
+                        return 'background-color: rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ');'
                     }
                 },
                 count(string) {
@@ -146,14 +163,7 @@
                     }
                     return strObj;
                 },
-                onSubmit() {
-                    let funSim = new window.CosineSimilarity()
-                    let cnts = []
-                    this.brcts.map((v) => {
-                        cnts.push({ key: v.key, ...this.count(v.brct) })
-                    })
-                    this.tableData = cnts
-
+                countsSimilarity(cnts) {
                     let vecs = []
                     cnts.map(cnt =>
                         vecs.push(this.codes.map(item =>
@@ -161,21 +171,45 @@
                         ))
                     )
 
-                    console.log("cnts", cnts);
-                    console.log("vecs", vecs);
-
-                    this.similarity = []
+                    let similarity = []
+                    let funSim = new window.CosineSimilarity()
                     vecs.map((vec1, i) => {
                         let row = {}
                         vecs.map((vec2, j) => {
                             let key = this.normKey(cnts[j].key)
                             row[key] = funSim.similarity(vec1, vec2)
-                            if(this.simMax< row[key]) this.simMax = row[key]
-                            if(this.simMin> row[key]) this.simMin = row[key]
+
+                            //保留最大最小值用于配色
+                            if (this.simMax < row[key]) this.simMax = row[key]
+                            if (this.simMin > row[key]) this.simMin = row[key]
                         })
-                        this.similarity.push({ key: cnts[i].key.substr(11), ...row })
+                        similarity.push({ key: cnts[i].key.substr(11), ...row })
                     })
-                    console.log("similarity", this.similarity);
+                    return similarity
+                },
+                caclBrctSimilarity() {
+                    let cnts = []
+                    this.brcts.map((v) => {
+                        cnts.push({ key: v.key, ...this.count(v.brct) })
+                    })
+                    this.tableData = cnts
+                    this.similarity = this.countsSimilarity(cnts)
+
+                },
+                caclWhileProteinSimilarity() {
+                    let cnts = []
+                    this.proteins.map((v) => {
+                        cnts.push({ key: v.key, ...this.count(v.value) })
+                    }) 
+                    debugger
+
+                    this.tableDataProtein = cnts
+                    this.similarityProtein = this.countsSimilarity(cnts)
+                },
+                onSubmit() {
+
+                    this.caclBrctSimilarity()
+                    this.caclWhileProteinSimilarity()
 
                 }
 

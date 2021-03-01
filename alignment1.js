@@ -103,7 +103,7 @@ function createArray(m, n) {
 }
 
 function longest_substring(s1, s2) {
-    let t = createArray(s1.length + 1, s2.length + 1) //[[0]*(1+s2.length) for i in range(1+s1.length]
+    let t = createArray(s1.length + 1, s2.length + 1) 
     let l = 0, xl = 0
     for (let x = 1; x < 1 + s1.length; x++) {
         for (let y = 1; y < 1 + s2.length; y++) {

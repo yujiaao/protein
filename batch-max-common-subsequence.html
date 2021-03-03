@@ -43,8 +43,8 @@
             :default-sort="{prop: 'name', order: 'descending'}">
             <el-table-column prop="key" label="key" >
             </el-table-column>
-            <el-table-column v-for="(item, index) in alignment" :key="index"
-                :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">
+            <el-table-column v-for="(item, index) in brctNames" :key="index"
+                :prop="item" :label="item">
             </el-table-column>
         </el-table>
 
@@ -54,8 +54,8 @@
             :default-sort="{prop: 'name', order: 'descending'}">
             <el-table-column prop="key" label="key" >
             </el-table-column>
-            <el-table-column v-for="(item, index) in alignment" :key="index"
-                :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">
+            <el-table-column v-for="(item, index) in brctNames" :key="index"
+                :prop="item" :label="item">
             </el-table-column>
         </el-table>
 
@@ -66,8 +66,8 @@
             :default-sort="{prop: 'name', order: 'descending'}">
             <el-table-column prop="key" label="key" >
             </el-table-column>
-            <el-table-column v-for="(item, index) in alignment" :key="index"
-                :prop="normKey(item[0]+'_'+(index+1))" :label="(item[0]+'_'+(index+1)).substr(11)">
+            <el-table-column v-for="(item, index) in brctNames" :key="index"
+                :prop="item" :label="item">
             </el-table-column>
         </el-table>
 
@@ -81,7 +81,7 @@
                     cutLength: 10,
                     percentage: 0,
                     progeressVisible: false,
-                    alignment: alignment,
+                    brctNames: brctNames(alignment),
                     isContinueSequence: true,
                     tableData: [],
                     tableDataPrefix: [],
@@ -90,18 +90,16 @@
             },
 
             methods: {
-                normKey(key) {
-                    return key.replaceAll('>', '').replaceAll('.', '_')
-                },
                 compareField(data, field) {
                     let res = []
                     data.map((itemI, i) => {
-                        let row = { key: itemI.key.substr(11) }
-                        let keyI = this.normKey(itemI.key)
+                        let row = { key: itemI.key }
+                        let keyI = itemI.key
 
+                        // debugger
                         data.map((itemJ, j) => {
                             this.percentage = (i * data.length + j + 1.0) / data.length / data.length * 100;
-                            let keyJ = this.normKey(itemJ.key)
+                            let keyJ = itemJ.key
                             //自己和自己比没有必要显示
                             if (keyJ == keyI) {
                                 row[keyJ] = '-'
@@ -127,6 +125,7 @@
                 onSubmit() {
                     this.progeressVisible = true
                     let table1 = calcTableData(alignment, proteins, this.cutLength)
+                    // console.log(table1);
                     this.percentage = 10
                     this.tableData = this.compareField(table1, 'brct')
                     this.tableDataPrefix = this.compareField(table1, 'before')
